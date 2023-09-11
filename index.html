@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="./styles.css" />
+
+    <title>Rock Paper Scissors</title>
+  </head>
+  <body>
+    <h1 class="header">Rock Paper Scissors</h1>
+    <div class="play-options">
+      <button id="rock">Rock</button>
+      <button id="paper">Paper</button>
+      <button id="scissors">Scissors</button>
+    </div>
+    <div class="result" id="result"></div>
+
+    <script src="https://cdn.jsdelivr.net/npm/brain.js"></script>
+    <script>
+      document.addEventListener("DOMContentLoaded", function () {
+        const net = new brain.NeuralNetwork();
+
+        const trainingData = [
+          { input: [1, 0, 0], output: [0, 1, 0] }, // Rock -> Paper
+          { input: [0, 1, 0], output: [0, 0, 1] }, // Paper -> Scissors
+          { input: [0, 0, 1], output: [1, 0, 0] }, // Scissors -> Rock
+        ];
+
+        net.train(trainingData);
+
+        function playGame(playerMove) {
+          const output = net.run(playerMove);
+
+          const computerMove = output.indexOf(Math.max(...output));
+          const moves = ["rock", "paper", "scissors"];
+
+          const resultElement = document.getElementById("result");
+          resultElement.innerHTML = `
+            <p>Player: ${moves[playerMove.indexOf(1)]}</p>
+            <p>Computer: ${moves[computerMove]}</p>
+          `;
+
+          if (computerMove === playerMove.indexOf(0.5)) {
+            resultElement.innerHTML += "<p>It's a draw!</p>";
+          } else if (
+            (playerMove.indexOf(1) === 0 && computerMove === 1) ||
+            (playerMove.indexOf(1) === 1 && computerMove === 2) ||
+            (playerMove.indexOf(1) === 2 && computerMove === 0)
+          ) {
+            resultElement.innerHTML += "<p>Computer wins!</p>";
+          } else {
+            resultElement.innerHTML += "<p>Player wins!</p>";
+          }
+        }
+
+        document.getElementById("rock").addEventListener("click", () => {
+          playGame([1, 0, 0]);
+        });
+
+        document.getElementById("paper").addEventListener("click", () => {
+          playGame([0, 1, 0]);
+        });
+
+        document.getElementById("scissors").addEventListener("click", () => {
+          playGame([0, 0, 1]);
+        });
+      });
+    </script>
+  </body>
+</html>
